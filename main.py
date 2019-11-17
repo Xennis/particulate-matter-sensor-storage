@@ -54,7 +54,7 @@ def get_or_create_table(client: bigquery.Client) -> bigquery.Table:
             bigquery.SchemaField('min_micro', 'NUMERIC', description=''),
             bigquery.SchemaField('samples', 'NUMERIC', description=''),
             bigquery.SchemaField('sds_p1', 'NUMERIC', description='Sensor SDS011 PM10 in µg/m³'),
-            bigquery.SchemaField('sds_p2', 'NUMERIC', description='Sensor PM2.5 PM10 in µg/m³'),
+            bigquery.SchemaField('sds_p2', 'NUMERIC', description='Sensor SDS011 PM2.5 in µg/m³'),
             bigquery.SchemaField('signal', 'NUMERIC', description='WiFi signal strength in dBm'),
             bigquery.SchemaField('temperature', 'NUMERIC', description='Sensor DHT22 temperature in °C'),
             bigquery.SchemaField('datetime', 'DATETIME', description='Datetime of measurement', mode='REQUIRED'),
