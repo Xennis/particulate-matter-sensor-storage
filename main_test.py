@@ -1,13 +1,13 @@
 import unittest
 
-from main import extract_sensor_data
+from main import extract_sensor_data, RequestInvalidError
 
 
 class TestExtractSensorData(unittest.TestCase):
 
     def test_valid(self):
         data = {
-            'esp8266id': '6773235',
+            'esp8266id': '9973235',
             'software_version': 'NRZ-2019-125-B1',
             'sensordatavalues': [
                 {'value_type': 'SDS_P1', 'value': '11.03'},
@@ -33,3 +33,17 @@ class TestExtractSensorData(unittest.TestCase):
         actual = extract_sensor_data(data)
         self.assertEqual(expected, actual)
 
+    def test_none_data(self):
+        data = None
+        self.assertRaises(RequestInvalidError, extract_sensor_data, data)
+
+    def test_empty_data(self):
+        data = {}
+        self.assertRaises(RequestInvalidError, extract_sensor_data, data)
+
+    def test_no_sensor_data(self):
+        data = {
+            'esp8266id': '9973235',
+            'software_version': 'NRZ-2019-125-B1'
+        }
+        self.assertRaises(RequestInvalidError, extract_sensor_data, data)
