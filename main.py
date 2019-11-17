@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import Request, Response
 from google.api_core.exceptions import NotFound
-from google.cloud import firestore, bigquery
+from google.cloud import bigquery
 
 
 class RequestInvalidError(Exception):
@@ -78,10 +78,6 @@ def pm_sensor_storage(request: Request) -> Response:
         return Response(status=400)
 
     sensor_data['datetime'] = datetime.now()
-
-    db = firestore.Client()
-    doc_ref = db.collection('pm_sensor')
-    doc_ref.add(sensor_data)
 
     client = bigquery.Client()
     errors = client.insert_rows(get_or_create_table(client), [sensor_data])
