@@ -1,8 +1,9 @@
 #!include:.gitignore
-.gcloudignore
-.git
-.gitignore
-.travis.yml
 
-# Tests
-*_test.py
+# Ignore everything
+/[!.]*
+/.?*
+
+# Except required files
+!main.py
+!requirements.txt
