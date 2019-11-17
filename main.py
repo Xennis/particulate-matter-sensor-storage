@@ -1,4 +1,5 @@
 import logging
+import os
 import typing
 from datetime import datetime
 
@@ -39,12 +40,12 @@ def extract_sensor_data(data: typing.Optional[dict]) -> typing.Dict[str, typing.
 
 def get_or_create_table(client: bigquery.Client) -> bigquery.Table:
     try:
-        dataset = client.get_dataset('pm_sensor')
+        dataset = client.get_dataset('sensors')
     except NotFound as _:
-        dataset = client.create_dataset('pm_sensor')
+        dataset = client.create_dataset('sensors')
 
     # The default project ID is not set and hence a fully-qualified ID is required.
-    table_ref = bigquery.TableReference(dataset, table_id='data')
+    table_ref = bigquery.TableReference(dataset, table_id='particulate_matter')
     try:
         return client.get_table(table_ref)
     except NotFound as _:
@@ -79,7 +80,7 @@ def pm_sensor_storage(request: Request) -> Response:
 
     sensor_data['datetime'] = datetime.now()
 
-    client = bigquery.Client()
+    client = bigquery.Client(location=os.getenv('BIGQUERY_REGION', 'europe-west3'))
     errors = client.insert_rows(get_or_create_table(client), [sensor_data])
     if errors:
         logging.warning('failed to store data in bigquery: %s', errors)
