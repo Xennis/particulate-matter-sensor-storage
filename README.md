@@ -49,5 +49,5 @@ make deploy
     | Server   | europe-west1-GCP-PROJECT.cloudfunctions.net |
     | Port     | 80                                          |
 
-Note: The sensor supports HTTPS. HTTP is used because the memory of the NodeMCU
-do not can handle larger SSL certificates. ([Source](https://github.com/opendata-stuttgart/meta/wiki/APIs#an-eigene-api-senden))
+Note: The firmware supports HTTPS, but the sensor crashes for larger SSL
+certificates because of the limited memory. ([Source](https://github.com/opendata-stuttgart/meta/wiki/APIs#an-eigene-api-senden))
