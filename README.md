@@ -10,7 +10,7 @@ runs on the sensor has the option to send the data also to an own API.
 The [Google Cloud Function](https://cloud.google.com/functions/) stores the sensor
 data together with a timestamp in [BigQuery](https://cloud.google.com/bigquery/).
 The sensor data in BigQuery can be easily analyzed. As an example a reported
-created with Data Studio that access the BigQuery table:
+created with Data Studio accessing that data:
 
 ![Data Studio report demo](./assets/data-studio-demo.svg)
 
