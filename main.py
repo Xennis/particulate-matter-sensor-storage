@@ -17,49 +17,54 @@ def extract_sensor_data(data: typing.Optional[dict]) -> typing.Dict[str, typing.
     :raises RequestInvalidError if the request is not valid.
     """
     if not data:
-        raise RequestInvalidError('no data')
-    sensor_data = data.get('sensordatavalues')
+        raise RequestInvalidError("no data")
+    sensor_data = data.get("sensordatavalues")
     if not isinstance(sensor_data, list):
-        raise RequestInvalidError('no sensor data list')
+        raise RequestInvalidError("no sensor data list")
     r = {}
     for sensor in sensor_data:
-        typ = sensor.get('value_type')
+        typ = sensor.get("value_type")
         if not isinstance(typ, str):
-            raise RequestInvalidError('value type is not a string')
+            raise RequestInvalidError("value type is not a string")
         typ = typ.lower()
-        val = sensor.get('value')
+        val = sensor.get("value")
         if not isinstance(val, str):
-            raise RequestInvalidError('raw value is not a string')
+            raise RequestInvalidError("raw value is not a string")
         try:
             val = float(val)
         except ValueError as e:
-            raise RequestInvalidError('value is not a float: {}'.format(e))
+            raise RequestInvalidError("value is not a float: {}".format(e))
         r[typ] = val
     return r
 
 
 def get_or_create_table(client: bigquery.Client) -> bigquery.Table:
     try:
-        dataset = client.get_dataset('sensors')
+        dataset = client.get_dataset("sensors")
     except NotFound as _:
-        dataset = client.create_dataset('sensors')
+        dataset = client.create_dataset("sensors")
 
     # The default project ID is not set and hence a fully-qualified ID is required.
-    table_ref = bigquery.TableReference(dataset, table_id='particulate_matter')
+    table_ref = bigquery.TableReference(dataset, table_id="particulate_matter")
     try:
         return client.get_table(table_ref)
     except NotFound as _:
-        return client.create_table(bigquery.Table(table_ref, schema=[
-            bigquery.SchemaField('humidity', 'NUMERIC', description='Sensor DHT22humidity in %'),
-            bigquery.SchemaField('max_micro', 'NUMERIC', description=''),
-            bigquery.SchemaField('min_micro', 'NUMERIC', description=''),
-            bigquery.SchemaField('samples', 'NUMERIC', description=''),
-            bigquery.SchemaField('sds_p1', 'NUMERIC', description='Sensor SDS011 PM10 in µg/m³'),
-            bigquery.SchemaField('sds_p2', 'NUMERIC', description='Sensor SDS011 PM2.5 in µg/m³'),
-            bigquery.SchemaField('signal', 'NUMERIC', description='WiFi signal strength in dBm'),
-            bigquery.SchemaField('temperature', 'NUMERIC', description='Sensor DHT22 temperature in °C'),
-            bigquery.SchemaField('datetime', 'DATETIME', description='Datetime of measurement', mode='REQUIRED'),
-        ]))
+        return client.create_table(
+            bigquery.Table(
+                table_ref,
+                schema=[
+                    bigquery.SchemaField("humidity", "NUMERIC", description="Sensor DHT22humidity in %"),
+                    bigquery.SchemaField("max_micro", "NUMERIC", description=""),
+                    bigquery.SchemaField("min_micro", "NUMERIC", description=""),
+                    bigquery.SchemaField("samples", "NUMERIC", description=""),
+                    bigquery.SchemaField("sds_p1", "NUMERIC", description="Sensor SDS011 PM10 in µg/m³"),
+                    bigquery.SchemaField("sds_p2", "NUMERIC", description="Sensor SDS011 PM2.5 in µg/m³"),
+                    bigquery.SchemaField("signal", "NUMERIC", description="WiFi signal strength in dBm"),
+                    bigquery.SchemaField("temperature", "NUMERIC", description="Sensor DHT22 temperature in °C"),
+                    bigquery.SchemaField("datetime", "DATETIME", description="Datetime of measurement", mode="REQUIRED"),
+                ],
+            )
+        )
 
 
 def pm_sensor_storage(request: Request) -> Response:
@@ -75,15 +80,15 @@ def pm_sensor_storage(request: Request) -> Response:
     try:
         sensor_data = extract_sensor_data(request.get_json(silent=True))
     except RequestInvalidError as e:
-        logging.warning('invalid request: %s', e)
+        logging.warning("invalid request: %s", e)
         return Response(status=400)
 
-    sensor_data['datetime'] = datetime.now()
+    sensor_data["datetime"] = datetime.now()
 
-    client = bigquery.Client(location=os.getenv('BIGQUERY_REGION', 'europe-west3'))
+    client = bigquery.Client(location=os.getenv("BIGQUERY_REGION", "europe-west3"))
     errors = client.insert_rows(get_or_create_table(client), [sensor_data])
     if errors:
-        logging.warning('failed to store data in bigquery: %s', errors)
+        logging.warning("failed to store data in bigquery: %s", errors)
         return Response(status=500)
 
     return Response(status=201)
