@@ -4,6 +4,7 @@ python:
 install:
   - pip install --requirement requirements.txt
 script:
-  - pytest
+  - make format-check
+  - make unittest
 branches:
   only: [master]
