@@ -83,7 +83,7 @@ def pm_sensor_storage(request: Request) -> Response:
         logging.warning("invalid request: %s", e)
         return Response(status=400)
 
-    sensor_data["datetime"] = datetime.now()
+    sensor_data["datetime"] = datetime.utcnow()
 
     client = bigquery.Client(location=os.getenv("BIGQUERY_REGION", "europe-west3"))
     errors = client.insert_rows(get_or_create_table(client), [sensor_data])
