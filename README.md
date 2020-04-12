@@ -42,11 +42,12 @@ make deploy
 ### Configuration
 
 * Open the configuration page of the senor
-* Enable the option _Send data to own API_ with the settings
+* Enable the option _Send data to custom API_ with the settings
 
     | Optional | Value                                       |
     | ---------|---------------------------------------------|
     | Server   | europe-west1-GCP-PROJECT.cloudfunctions.net |
+    | Path     | /pm_sensor_storage                          |
     | Port     | 80                                          |
 
 Note: The firmware supports HTTPS, but the sensor crashes for larger SSL
